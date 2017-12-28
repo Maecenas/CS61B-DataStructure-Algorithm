@@ -1,0 +1,722 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Thu May  8 15:28:34 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (readme) def
+/fdir (.) def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (05/08/14) def
+/modtimestr (15:28:31) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                                 CS 61B Lab 15) s
+5 508 M
+(                                 May 8-9, 2014) s
+5 500 M
+(                                 Sorting Games) s
+5 484 M
+(Goal:  To help you practice sorting algorithms for the final exam.) s
+5 468 M
+(You MUST have a partner for this lab, unless there's an odd number of people) s
+5 460 M
+(and you are the odd one out.  You'll also need lots of paper.) s
+5 444 M
+(Copy the Lab 15 directory by doing the following, starting from your home) s
+5 436 M
+(directory.) s
+5 420 M
+(  cp -r ~cs61b/lab/lab15 .) s
+5 404 M
+(In this lab, you and your partner will help each other practice the in-place) s
+5 396 M
+(array versions of heapsort, quicksort, and quickselect.  Then you will compete) s
+5 388 M
+(against another team for the fastest sorting time.) s
+5 372 M
+(Hour 1:) s
+5 364 M
+(-------) s
+5 356 M
+(The lab directory includes a program called GimmeYoNumber, which prints two) s
+5 348 M
+(lists of 13 random numbers in the range 0...99.  Although the numbers for) s
+5 340 M
+("Opponent 1" and "Opponent 2" are different, the two lists have been scrambled) s
+5 332 M
+(exactly the same way, and will require exactly the same sequence of swaps to) s
+5 324 M
+(sort them.) s
+5 308 M
+(For now, take just the first list of numbers and write them in a row on a sheet) s
+5 300 M
+(of paper.  One of you should then sort the numbers with in-place heapsort as) s
+5 292 M
+(described in the Lecture 30 notes, while your partner watches, catches your) s
+5 284 M
+(mistakes, and helps if you're uncertain of the details of the algorithm.) s
+5 268 M
+(To prepare for competition, you should diagram the sorting process in a) s
+5 260 M
+(particular way:  each swap of two keys is written on a separate line, under the) s
+5 252 M
+(previous swap.  For example, here's an illustration of selection sort.  \(Lined) s
+5 244 M
+(paper helps.\)) s
+5 228 M
+(                            83 18 72 21 93 44  7 21) s
+5 220 M
+(                            -----------------------) s
+5 212 M
+(                             7                83) s
+5 204 M
+(                            -----------------------) s
+5 196 M
+(                                  21 72) s
+5 188 M
+(                            -----------------------) s
+5 180 M
+(                                     21          72) s
+5 172 M
+(                            -----------------------) s
+5 164 M
+(                                        44 93) s
+5 156 M
+(                            -----------------------) s
+5 148 M
+(                                           72    93) s
+5 132 M
+(You must write down EVERY swap of two keys \(unlike in the Lecture 30 notes,) s
+5 124 M
+(where I did entire removeMin\(\) operations in one step\).  If you swap two) s
+5 116 M
+(identical keys \(as often happens in quicksort, and can happen in heapsort\), you) s
+5 108 M
+(must illustrate that too.  You do not have to note when a key is swapped with) s
+5 100 M
+(itself; for instance, in the selection sort above, the 18 is swapped with) s
+5 92 M
+(itself, but I haven't written it down.  In each row, you are allowed to write) s
+5 84 M
+(down keys that haven't moved, but you don't have to.  \(I've omitted them all in) s
+5 76 M
+(the example above.\)  This same format will be accepted on the final exam.) s
+5 60 M
+(When you're done, run GimmeYoNumber again and have your partner practice) s
+5 52 M
+(in-place heapsort.  When you're confident that both you and your partner) s
+5 44 M
+(understand heapsort, repeat the process with in-place quicksort \(exactly as) s
+5 36 M
+(described in the Lecture 31 notes\) and in-place quickselect.  Always choose the) s
+5 28 M
+(second key from the left to be the pivot.  When you practice quickselect, your) s
+5 20 M
+(goal is to find the median key \(seventh out of thirteen\).) s
+5 4 M
+(When you think you're ready to compete, or one hour has passed \(whichever comes) s
+376 516 M
+(first\), it's time to find another team to vanquish...) s
+376 500 M
+(Hour 2:) s
+376 492 M
+(-------) s
+376 484 M
+(Find another team to compete against.  \(If you're the odd team out, wait until) s
+376 476 M
+(a game completes; the losers are required to play a second game.\)  You will) s
+376 468 M
+(play a round of heapsort and a round of quicksort.  If each team wins one) s
+376 460 M
+(round, you'll have a quickselect tiebreaker.) s
+376 444 M
+(During each sort, either you or your partner will be the _lead_, and the other) s
+376 436 M
+(will be the assistant.  Only the lead is allowed to write.  The assistant is) s
+376 428 M
+(allowed to speak, point out mistakes, etc., but not to hold a writing) s
+376 420 M
+(instrument.  The lead is allowed to write any diagrams that will help with) s
+376 412 M
+(sorting \(e.g. heaps in tree form\), in addition to the official answer.) s
+376 396 M
+(Designate one of yourselves to be the heapsort lead, and the other to be the) s
+376 388 M
+(quicksort lead.  \(Either of you can lead the quickselect tiebreaker; if one of) s
+376 380 M
+(you is clearly faster, that one should get the job.\)) s
+376 364 M
+(Decide which team is Opponent 1 and which is Opponent 2.  To start a round of) s
+376 356 M
+(sorting, run GimmeYoNumber, which will generate one list for each team.  Each) s
+376 348 M
+(team writes down their complete list on a sheet of paper.  Then, it's up to you) s
+376 340 M
+(whether you want to be in eyeshot of the opposing team or not.  Perform the) s
+376 332 M
+(sort.  When you are done, yell "Sorted!".) s
+376 316 M
+(The team that declared themselves sorted first is the tentative winner.) s
+376 308 M
+(After making this statement, you must immediately hand your solution to the) s
+376 300 M
+(other team; you are not allowed to write on that paper again.  The other team) s
+376 292 M
+(may finish their solution at their leisure, then hand it to you.) s
+376 276 M
+(The round ends with each team checking the other team's sort for errors.) s
+376 268 M
+(A team that has made an error \(e.g. omitting a swap of two equal keys\) loses) s
+376 260 M
+(the round unless both teams made an error, in which case the round must be) s
+376 252 M
+(repeated.  Disputes on whether something is an error shall be adjudicated by) s
+376 244 M
+(the TA or a lab assistant.  If neither team made an error, the team that) s
+376 236 M
+(finished first wins the round.) s
+376 220 M
+(The first team to win two rounds \(including the quickselect tiebreaker if) s
+376 212 M
+(necessary\) wins the game.  If you lose the game, you must play a second game) s
+376 204 M
+(with a different team to get full marks for the lab.  Please give preference to) s
+376 196 M
+(a team that hasn't had a chance to play yet.) s
+376 180 M
+(To get full marks for the lab, you must either play two games or win one.  You) s
+376 172 M
+(are welcome to play additional games, though.) s
+376 156 M
+(Bonus) s
+376 148 M
+(-----) s
+376 140 M
+(One in ten billion players will be the lucky winner of a FRIENDSHIP WITH) s
+376 132 M
+(BRITNEY SPEARS!  To find out if you've won, enter the first ten digits printed) s
+376 124 M
+(by GimmeYoNumber into your cell phone.) s
+376 108 M
+(Check-off) s
+376 100 M
+(---------) s
+376 92 M
+(2 points:  For playing one game against another team and losing.) s
+376 84 M
+(4 points:  For playing a game against another team and winning, or for) s
+376 76 M
+(           playing games against two different teams.) s
+_R
+S
+%%Trailer
+%%Pages: 1
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

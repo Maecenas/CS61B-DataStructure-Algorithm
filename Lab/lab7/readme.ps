@@ -1,0 +1,794 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Wed Mar  5 20:37:22 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (03/05/14) def
+/modtimestr (20:37:02) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                                 CS 61B  Lab 7) s
+5 508 M
+(                                March 6-7, 2014) s
+5 492 M
+(Goal:  This lab will introduce you to gjdb, the Java debugger.) s
+5 476 M
+(Copy the Lab 7 directory by starting from your home directory and typing:) s
+5 460 M
+(  cp -r ~cs61b/lab/lab7 .) s
+5 444 M
+(The Java Debugger Tutorial) s
+5 436 M
+(--------------------------) s
+5 428 M
+(Welcome.  You now find yourself in the position of debugging somebody else's) s
+5 420 M
+(bad code in DebugMe.java, which is supposed to compute the partial geometric) s
+5 412 M
+(series) s
+5 396 M
+(                   1     1     1) s
+5 388 M
+(              1 + --- + --- + ---       \(which equals 1.875\)) s
+5 380 M
+(                   2     4     8) s
+5 364 M
+(DebugMe.main\(\) begins by calling the recursive method createGeomSeries\(\), which) s
+5 356 M
+(creates a linked list in which each node contains one term of the above series.) s
+5 348 M
+(Next, main\(\) calls the recursive method listSum\(\) to compute the sum of the) s
+5 340 M
+(nodes in the list.  As you may have guessed, it doesn't work.  If you compile) s
+5 332 M
+(and run DebugMe you will see that it prints the value 1.0 instead of 1.875.) s
+5 316 M
+(Some documentation on the java debugger \(gjdb\) is available in the course) s
+5 308 M
+(reader and is also linked from the class Web page.  \(The Java debugger provided) s
+5 300 M
+(with Oracle's Java Development Kit is called jdb.  Professor Hilfinger modified) s
+5 292 M
+(it and built a better interface for it.\)  Here is a summary of how you might) s
+5 284 M
+(use gjdb to track down the error in this program.) s
+5 268 M
+(\(1\)  Compile the program with the debugging switch `-g'.) s
+5 252 M
+(        javac -g DebugMe.java) s
+5 236 M
+(\(2\)  Instead of running java, you could run gjdb as follows.) s
+5 220 M
+(        gjdb DebugMe) s
+5 204 M
+(When you see the `[-]' prompt, the debugger is ready to go, and you may) s
+5 196 M
+(follow the instructions in the course reader on how to use it.  However, rather) s
+5 188 M
+(than run gjdb from a shell, we recommend you run it from emacs.  Emacs will) s
+5 180 M
+(interpret the output of the debugger and show you where the debugger is in your) s
+5 172 M
+(.java files, which is extremely useful.  To begin, type `Meta-x gjdb' from) s
+5 164 M
+(within emacs.  When asked to fill in the gjdb command, use `gjdb DebugMe'.  You) s
+5 156 M
+(should see a new window appear with the `[-]' prompt.) s
+5 140 M
+(\(3\)  gjdb is a command-line driven program.  The most important command you) s
+5 132 M
+(should learn how to use is the \(limited\) on-line help; type help at the prompt.) s
+5 116 M
+(        [-] help) s
+5 100 M
+(If you see a command that looks like the one you want, but need more) s
+5 92 M
+(information, type `help <command>', replacing <command> with the command you) s
+5 84 M
+(want to know more about.) s
+376 508 M
+(\(4\)  To run the program from within the debugger, type `run' at the prompt.) s
+376 492 M
+(        [-] run) s
+376 476 M
+(This executes your program FROM THE BEGINNING.) s
+376 460 M
+(\(5\)  The other most important command is `quit'.) s
+376 444 M
+(When gjdb is stuck, not giving you a command prompt, you may simply kill the) s
+376 436 M
+(emacs buffer in which gjdb is running.  If you ever need to restart gjdb, make) s
+376 428 M
+(sure your cursor is in the debugger window and type `C-x k'.) s
+376 412 M
+(\(6\)  Let's see what's happening within the main function.  So that we can do) s
+376 404 M
+(this, we'll set a breakpoint at the beginning of main\(\).) s
+376 388 M
+(        [-] break DebugMe.main) s
+376 372 M
+(This tells the debugger to stop when execution reaches the beginning of the) s
+376 364 M
+(main method.  \(You can also set breakpoints at specific line numbers.  If) s
+376 356 M
+(you've written small modular programs, you will rarely find that necessary.\)) s
+376 340 M
+(Start the program by typing `run'.  When execution reaches the breakpoint,) s
+376 332 M
+(emacs will show the DebugMe.java file in a separate window with the current) s
+376 324 M
+(line indicated by an `=>' arrow.) s
+376 308 M
+(\(7\)  At the beginning of the `main' function, there's no sign yet of the bug.) s
+376 300 M
+(Execute slowly through the code using either the `next' command or the `step') s
+376 292 M
+(command.  These two commands have a crucial difference:  `next' executes one) s
+376 284 M
+(statement in full, including any method calls.  `step' normally executes one) s
+376 276 M
+(statement, but if the statement includes a method call, execution stops at the) s
+376 268 M
+(first line of the called method.  Think of `step' as `stepping into' a method.) s
+376 260 M
+(In emacs, C-c C-s or the f5 key is shorthand for 'step', and C-c C-n or the f6) s
+376 252 M
+(key is shorthand for `next'.) s
+376 236 M
+(Type f6 twice while watching the '=>' arrow in the other window.  The arrow) s
+376 228 M
+(should now point to the line that declares `sum' and assigns it a value.) s
+376 220 M
+(This means that we are about to execute that line, but haven't yet.) s
+376 212 M
+(\(If you stepped too far, you can start over by typing `run' again.\)) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (03/05/14) def
+/modtimestr (20:37:02) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(\(8\)  Let's see if the list `geomSeries' has been constructed correctly.  It is) s
+5 500 M
+(made of ListNodes, each containing an item and a reference to the next ListNode) s
+5 492 M
+(in the list.  Let's inspect the local variables and confirm that they have) s
+5 484 M
+(values we expect.) s
+5 468 M
+(        main[0] info locals) s
+5 452 M
+(You can also inspect the value of any variable or expression using the `print') s
+5 444 M
+(command.) s
+5 428 M
+(        main[0] print geomSeries) s
+5 412 M
+(Since geomSeries is a reference to a ListNode, this information isn't very) s
+5 404 M
+(useful.  But we can view the ListNode's item as follows.  \(We can also use `p') s
+5 396 M
+(as shorthand for `print'.\)) s
+5 380 M
+(        main[0] p geomSeries.item) s
+5 372 M
+(        main[0] p geomSeries.item.toString\(\)) s
+5 356 M
+(Each item is a Double \(from java.lang\), which defines a toString method, which) s
+5 348 M
+(prints the item.  We can see the second element of the list as follows.) s
+5 332 M
+(        main[0] p geomSeries.next.item) s
+5 324 M
+(        main[0] p geomSeries.next.item.toString\(\)) s
+5 308 M
+([1 point]  Implement a toString method in ListNode.java that prints the) s
+5 300 M
+(contents of the full list.  Recompile the file, re-run the debugger, step again) s
+5 292 M
+(to the third line of main\(\), and print the value of the list from the debugger.) s
+5 276 M
+(        main[0] print geomSeries.toString\(\)) s
+5 260 M
+(Draw a box-and-pointer diagram of the geomSeries data structure, including all) s
+5 252 M
+(ListNodes and items.) s
+5 236 M
+([1 point]  Find a simple command \(either by the `help' command or by the gjdb) s
+5 228 M
+(documentation in your reader or online\) that allows you to directly print the) s
+5 220 M
+(geomSeries to a deeper number of levels, and thereby learn the structure of) s
+5 212 M
+(geomSeries without calling toString\(\).  Note that this command will print a lot) s
+5 204 M
+(of extraneous information too, like a bunch of "final static" constants) s
+5 196 M
+(associated with the Double class.) s
+5 180 M
+(\(9\)  Set a breakpoint on the createGeomSeries method.) s
+5 164 M
+(        [-] break DebugMe.createGeomSeries) s
+5 148 M
+(`run' the program again.  Your program is still set to break at the beginning) s
+5 140 M
+(of main, so type `cont' \(or just `c' for short\) to `continue' execution.  You) s
+5 132 M
+(could instead use f8 in emacs.  When the debugger reached createGeomSeries, use) s
+5 124 M
+(`info locals' to see the value of the parameters `r' and `N'.  Since) s
+5 116 M
+(createGeomSeries is a recursive function, you will want to look at these) s
+5 108 M
+(variables during several invocations of createGeomSeries.  To do this, repeat) s
+5 100 M
+(the two commands `cont' and `info locals' until you see each invocation of the) s
+5 92 M
+(recursive function.  You should now be able to determine the bug in the) s
+5 84 M
+(program.) s
+5 68 M
+([2 points]  Fix the bug in the program, recompile it, and run it.  Make sure) s
+5 60 M
+(you are getting the right answer.) s
+376 508 M
+(Check-off) s
+376 500 M
+(---------) s
+376 492 M
+(Show your TA or Lab Assistant that DebugMe produces the correct answer, and) s
+376 484 M
+(that you can print a list from within the debugger.) s
+376 468 M
+(1 point:   Show your box-and-pointer diagram of the geomSeries list \(in the) s
+376 460 M
+(           original buggy version\).) s
+376 452 M
+(1 point:   Show that your toString method makes it possible for you to print) s
+376 444 M
+(           a complete list from within the debugger.  Say what other debugger) s
+376 436 M
+(           command can give you the same information without calling toString.) s
+376 428 M
+(2 points:  Show that your debugged program is producing the right answer.) s
+376 412 M
+(Postscript) s
+376 404 M
+(----------) s
+376 396 M
+(Use the debugger to find the sources of the bugs in your project.  Although it) s
+376 388 M
+(takes some effort to learn to use a debugger, it will save you a lot of time) s
+376 380 M
+(this semester if you get accustomed to using it now.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

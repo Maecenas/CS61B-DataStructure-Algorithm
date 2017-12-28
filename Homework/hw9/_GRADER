@@ -1,0 +1,23 @@
+1. Mark all walls as true (unbroken).
+2. Randomly choose a starting cell.
+3. Mark this cell as visited.
+4. Randomly choose a direction, above, below, left, or right. Mark the wall
+   as false (broken) and recursively perfrom DFS (step 3 and 4) on the cell
+   across the wall.
+
+Process 3. & 4. are the implementation of DFS (Depth-first search) algorithm.
+
+(a) How would your algorithm ensure that there is a path between every pair of
+    cells, but no more than one path between any pair of cells (i.e., no
+    cycles)?
+    // Disjoint Sets - Graph
+    Every wall represents an edge and initially it is false, meaning that every
+    cell is connected. The graph is therefore connected and DFS is able to
+    traverse the whole graph. Every cell visited is marked and will not be
+    a loop.
+
+(b) How does your algorithm use random numbers to generate a different maze
+    each time? Specifically, what decision should be made by random numbers
+    at each recursive invocation of the depth-first search method?
+    - Randomly choose a cell as the starting cell.
+    - Randomly generate a direction in #4.

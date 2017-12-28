@@ -1,0 +1,31 @@
+GRADER file for Homework 8
+
+ Your Name:  
+Your Login:  
+
+Part III.  Running time comparisons
+
+  List size         mergesort             quicksort
+      100                1                     0
+    1,000                7                     5
+   10,000               22                    24
+  100,000              258                   301
+1,000,000             4416                  2606
+
+Part IV.
+
+  Is mergesort stable?  
+  Why or why not?
+  ============================================================
+  It is not stable. An input of [ 5 4 4 ] would be unstable.
+
+  However, mergesort can be implemented to be stable in a few lines.
+
+  Is quicksort stable?  
+  Why or why not?
+  ============================================================
+  It is stable, because the program scan the queue from left to right
+  using enque() when partitioning without breaking the stability.
+
+  The linked list version of quicksort we have seen can be stable,
+  but the array version is decidedly not.
